@@ -16,11 +16,19 @@ addEventListener('fetch', event => {
 })
 
 /**
- * Respond with hello worker text
+ * Handles request to the path /links and returns the array of links
  * @param {Request} request
  */
 async function handleRequest(request) {
-  return new Response('Hello worker!', {
-    headers: { 'content-type': 'text/plain' },
-  })
+  const init = {
+    headers: {
+      'content-type': 'application/json;charset=UTF-8'
+    }
+  };
+  const url = new URL(request.url);
+  const { pathname } = url;
+
+  if (pathname === '/links') {
+    return new Response(JSON.stringify(links), init);
+  }
 }
