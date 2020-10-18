@@ -1,5 +1,3 @@
-const { LinksTransformer } = require('./transformers.js');
-
 /**
  * Constants for links
  */
@@ -11,6 +9,27 @@ const links = [
  ];
 
 const staticURL = 'https://static-links-page.signalnerve.workers.dev';
+
+/**
+ * TRANSFORMERS
+ * 
+ * 
+ * Targets the div#links selector
+ * and adds in a new 'a' element for each link
+ */
+class LinksTransformer {
+  constructor(links) {
+     this.links = links
+  }
+
+  async element(element) {
+     for (let i = 0, n = this.links.length; i < n; i += 1) {
+         let link = this.links[i];
+         element.append(`<a href="${link.url}">${link.name}</a>`, { html: true });
+     }
+  }
+}
+
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
@@ -43,7 +62,8 @@ async function handleHTMLrequest() {
       "content-type": "text/html;charset=UTF-8",
     },
   }
-  const response = await fetch(staticURL, init);
+  const response = await fetch(staticURL);
 
-  return new HTMLRewriter().on("div#links", new LinksTransformer(links));
+  return new HTMLRewriter().on("div#links", new LinksTransformer(links))
+    .transform(response);
 }
