@@ -1,4 +1,4 @@
-
+import { LinksTransformer } from './transformers.js';
 
 /**
  * Constants for links
@@ -44,7 +44,6 @@ async function handleHTMLrequest() {
     },
   }
   const response = await fetch(staticURL, init);
-  const results = await response.text();
 
-  return new Response(results, init);
+  return new HTMLRewriter().on("div#links", new LinksTransformer(links));
 }
