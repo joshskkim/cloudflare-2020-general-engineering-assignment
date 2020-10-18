@@ -1,14 +1,15 @@
 /**
- * Constants for links
+ * CONSTANTS
  */
 
 const links = [
   { 'name': 'Cloudflare', 'url': 'https://www.cloudflare.com/' },
-  { 'name': 'DoorDash', 'url': 'https://www.doordash.com/' },
-  { 'name': 'Shopify', 'url': 'https://www.shopify.com/' },
+  { 'name': 'LinkedIn', 'url': 'https://www.linkedin.com/in/joshuaskkim/' },
+  { 'name': 'GitHub Repo', 'url': 'https://github.com/joshskkim/cloudflare-2020-general-engineering-assignment' },
  ];
-
 const staticURL = 'https://static-links-page.signalnerve.workers.dev';
+const image = 'https://i.imgur.com/cPXU297.jpg';
+const name = 'Joshua Kim';
 
 /**
  * TRANSFORMERS
@@ -30,12 +31,49 @@ class LinksTransformer {
   }
 }
 
+/**
+ * Removes the display: none from the div#profile container
+ */
+class DisplayTransformer {
+  async element(element) {
+    const style = element.getAttribute('style');
+    if(style) element.setAttribute('style', style.replace('display: none', ''));
+  }
+}
+
+/**
+ * Updates the two child elements in profile to show user avatar and name
+ */
+class ImageTransformer {
+  constructor(image) {
+    this.image = image
+  }
+
+  async element(element) {
+    element.setAttribute('src', this.image);
+  }
+}
+
+/**
+ * Sets text to username
+ */
+class NameTransformer {
+  constructor(name) {
+    this.name = name;
+  }
+
+  async element(element) {
+    element.setInnerContent(this.name);
+  }
+}
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
 
 /**
+ * HANDLERS
+ * 
  * Handles request to the path /links and returns the array of links
  * if not, renders a static HTML page
  * @param {Request} request
@@ -59,11 +97,14 @@ async function handleRequest(request) {
 async function handleHTMLrequest() {
   const init = {
     headers: {
-      "content-type": "text/html;charset=UTF-8",
+      'content-type': 'text/html;charset=UTF-8',
     },
   }
-  const response = await fetch(staticURL);
+  const response = await fetch(staticURL, init);
 
-  return new HTMLRewriter().on("div#links", new LinksTransformer(links))
+  return new HTMLRewriter().on('div#links', new LinksTransformer(links))
+    .on('div#profile', new DisplayTransformer())
+    .on('img#avatar', new ImageTransformer(image))
+    .on('h1#name', new NameTransformer(name))
     .transform(response);
 }
