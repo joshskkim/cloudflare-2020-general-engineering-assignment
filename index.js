@@ -1,4 +1,4 @@
-import { LinksTransformer } from './transformers.js';
+const { LinksTransformer } = require('./transformers.js');
 
 /**
  * Constants for links
